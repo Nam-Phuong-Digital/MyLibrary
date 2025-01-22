@@ -122,9 +122,9 @@ public class CalendarPopoverController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        let previous = UIBarButtonItem(image: Resource.Icon.back, style: .done, target: calendar, action: #selector(calendar.selectorBack(_:)))
+        let previous = UIBarButtonItem(image: Resource.Icon.back?.resizeImageWith(newSize: .standardButtonBar), style: .done, target: calendar, action: #selector(calendar.selectorBack(_:)))
         previous.tintColor = Resource.Color.onPrimary
-        let next = UIBarButtonItem(image: Resource.Icon.right, style: .done, target: calendar, action: #selector(calendar.selectorNext(_:)))
+        let next = UIBarButtonItem(image: Resource.Icon.right?.resizeImageWith(newSize: .standardButtonBar), style: .done, target: calendar, action: #selector(calendar.selectorNext(_:)))
         next.tintColor = Resource.Color.onPrimary
         let btnToday = UIButton(type: .custom)
         btnToday.setTitleStyle(title: "Today".localizedString(), color: Resource.Color.onPrimary)
