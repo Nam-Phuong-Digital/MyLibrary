@@ -91,6 +91,8 @@ public class TableDataSource<T: Hashable, CELL: UITableViewCell>:NSObject, UITab
     private var shouldReloadSections: [Int] = []
     
 #if canImport(RxSwift)
+    private let _stopLoading = PublishSubject<Void>()
+    public var stopLoading: AnyObserver<Void> { return _stopLoading.asObserver() }
     private let _scrollViewAction = PublishSubject<DataSourceScrollViewConfiguration>()
     private let _items = PublishSubject<[SectionDataSourceModel<T>]>()
     public var items: AnyObserver<[SectionDataSourceModel<T>]> { return _items.asObserver() }
@@ -192,6 +194,14 @@ public class TableDataSource<T: Hashable, CELL: UITableViewCell>:NSObject, UITab
                 owner.finishLoadMore()
                 owner.finishPullToRefresh()
                 owner.updateSections(items: items)
+            })
+            .disposed(by: self.disposeBag)
+        
+        _stopLoading
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self, onNext: { owner, _ in
+                owner.finishLoadMore()
+                owner.finishPullToRefresh()
             })
             .disposed(by: self.disposeBag)
     }

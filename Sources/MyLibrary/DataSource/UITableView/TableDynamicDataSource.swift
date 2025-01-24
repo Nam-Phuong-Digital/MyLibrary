@@ -152,6 +152,8 @@ public class TableDynamicDataSource<T: Hashable> :NSObject, UITableViewDelegate,
     
     private let _items = PublishSubject<[SectionDataSourceModel<T>]>()
     public var items: AnyObserver<[SectionDataSourceModel<T>]> { return _items.asObserver() }
+    private let _stopLoading = PublishSubject<Void>()
+    public var stopLoading: AnyObserver<Void> { return _stopLoading.asObserver() }
     
     private let disposeBag = DisposeBag()
     
@@ -217,6 +219,14 @@ public class TableDynamicDataSource<T: Hashable> :NSObject, UITableViewDelegate,
                 owner.finishLoadMore()
                 owner.finishPullToRefresh()
                 owner.updateSections(items: items)
+            })
+            .disposed(by: self.disposeBag)
+        
+        _stopLoading
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self, onNext: { owner, _ in
+                owner.finishLoadMore()
+                owner.finishPullToRefresh()
             })
             .disposed(by: self.disposeBag)
     }
