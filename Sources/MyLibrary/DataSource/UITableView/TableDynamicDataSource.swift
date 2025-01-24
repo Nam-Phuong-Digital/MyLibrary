@@ -563,7 +563,7 @@ private extension TableDynamicDataSource {
 }
 
 @available(iOS 13,*)
-extension TableDynamicDataSource {
+public extension TableDynamicDataSource {
     
     func getDataSource() -> SwipableDataSource<T> {
         let ds =  self._dataSource as! SwipableDataSource<T>
@@ -571,7 +571,7 @@ extension TableDynamicDataSource {
         return ds
     }
     
-    func setUpDataSource(
+    private func setUpDataSource(
         configCell:@escaping ((_ item: T,_ indexPath: IndexPath,_ tableView: UITableView) -> UITableViewCell)
     ) {
         self._dataSource = SwipableDataSource<T>(tableView: self.tableView, cellProvider: { tableView, indexPath, itemIdentifier in
