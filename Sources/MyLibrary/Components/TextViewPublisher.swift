@@ -40,7 +40,7 @@ public class TextViewPublisher: BaseObservableView, UITextViewDelegate {
         }
     }
     
-    @IBInspectable public var placeholderColor:UIColor = UIColor.borderColor {
+    @IBInspectable public var placeholderColor:UIColor = UIColor.borderColor1 {
         didSet {
             if lblPlaceholder != nil {
                 lblPlaceholder.textColor = placeholderColor

@@ -269,8 +269,8 @@ public extension UIColor {
         return UIColor("#36AF49")
     }
     
-    static var placeholder = UIColor("#C0C5CA")
-    static var borderColor = UIColor("#C0C5CA")
+    static var placeholder1 = UIColor("#C0C5CA")
+    static var borderColor1 = UIColor("#C0C5CA")
     
 }
 
@@ -301,7 +301,7 @@ extension Color {
         )
     }
     
-    static var placeholder = Color("#C0C5CA")
-    static var borderColor = Color("#C0C5CA")
+    static var placeholder1 = Color("#C0C5CA")
+    static var borderColor1 = Color("#C0C5CA")
     static var mainColor = Color("#006885")
 }

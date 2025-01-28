@@ -104,7 +104,7 @@ public class TextFieldPublisher: BaseObservableView {
     public var placeHolder:String  = "" {
         didSet {
             if textField != nil {
-                textField.attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.borderColor])
+                textField.attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.borderColor1])
             }
         }
     }
