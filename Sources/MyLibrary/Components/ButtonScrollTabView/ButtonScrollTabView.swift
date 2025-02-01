@@ -48,7 +48,7 @@ public class ButtonScrollTabView: UIView {
     weak public  var delegate:ButtonScrollTabViewDelegate?
     public var buttonTabs:[ButtonTab] = []
     public var contentInset:UIEdgeInsets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
-    
+    public var isCenterSelected: Bool = true
     @IBOutlet weak var scrollView:UIScrollView!
     @IBOutlet weak var leading: NSLayoutConstraint!
     @IBOutlet weak var stackButton: UIStackView!
@@ -116,8 +116,11 @@ public class ButtonScrollTabView: UIView {
                         
                         if selected, self.selectIndex < self.stackButton.arrangedSubviews.count {
                             let f:CGRect = self.stackButton.convert(self.stackButton.arrangedSubviews[self.selectIndex].frame, to: self.scrollView)
-                            self.scrollView.setContentOffset(CGPoint(x:(f.origin.x - self.scrollView.frame.width/2 + f.width/2), y: 0), animated: true)
-//                            self.scrollView.scrollRectToVisible(f, animated: true)
+                            if self.isCenterSelected {
+                                self.scrollView.setContentOffset(CGPoint(x:(f.origin.x - self.scrollView.frame.width/2 + f.width/2), y: 0), animated: true)
+                            } else {
+                                self.scrollView.scrollRectToVisible(f, animated: true)
+                            }
                         }
                     }
                     CATransaction.commit()
