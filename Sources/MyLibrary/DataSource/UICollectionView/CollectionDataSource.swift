@@ -7,6 +7,9 @@
 
 import Foundation
 import UIKit
+#if canImport(RxSwift)
+import RxSwift
+#endif
 public extension UICollectionView {
     func dequeue<T: UICollectionViewCell>(_ cellType: T.Type, indexPath: IndexPath) -> T {
         dequeueReusableCell(withReuseIdentifier: cellType.identifier, for: indexPath) as! T
@@ -61,6 +64,14 @@ public class CollectionDataSource<T: Hashable, CELL: UICollectionViewCell>:NSObj
         }
     }
     
+    #if canImport(RxSwift)
+    let _itemsTrigger = PublishSubject<[SectionDataSourceModel<T>]>()
+    public var items: AnyObserver<[SectionDataSourceModel<T>]> { _itemsTrigger.asObserver() }
+    let _stopLoadingTrigger = PublishSubject<Void>()
+    public var stopLoadingTrigger: AnyObserver<Void> { _stopLoadingTrigger.asObserver() }
+    private let disposeBag = DisposeBag()
+    #endif
+    
     private var _dataSource: Any?
     let collectionView: UICollectionView
     var sections:[SectionDataSourceModel<T>] = []
@@ -97,6 +108,36 @@ public class CollectionDataSource<T: Hashable, CELL: UICollectionViewCell>:NSObj
                 self.collectionView.collectionViewLayout = layout
             }
         }
+        #if canImport(RxSwift)
+        _itemsTrigger
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self) { s, sections in
+                if sections.isEmpty {
+                    s.showNoData()
+                } else {
+                    s.hideNoData()
+                }
+                if #available(iOS 13, *) {
+                    var snap = NSDiffableDataSourceSnapshot<Int, T>()
+                    let sectionIndex = sections.enumerated().map{$0.0}
+                    snap.appendSections(sectionIndex)
+                    sections.enumerated().forEach { (offset,section) in
+                        snap.appendItems(section.items, toSection: offset)
+                    }
+                    s.getDataSource().apply(snap)
+                } else {
+                    s.collectionView.reloadData()
+                }
+            }
+            .disposed(by: disposeBag)
+            _stopLoadingTrigger
+                .observe(on: MainScheduler.instance)
+                .subscribe(with: self) { s, _ in
+                    s.finishLoadMore()
+                    s.loadMoreIndicator.stop()
+                }
+                .disposed(by: disposeBag)
+        #endif
     }
    
     public func updateItems(_ items: [T], to section: Int = 0) {
