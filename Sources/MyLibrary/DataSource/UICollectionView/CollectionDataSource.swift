@@ -112,6 +112,7 @@ public class CollectionDataSource<T: Hashable, CELL: UICollectionViewCell>:NSObj
         _itemsTrigger
             .observe(on: MainScheduler.instance)
             .subscribe(with: self) { s, sections in
+                s.sections = sections
                 if sections.isEmpty {
                     s.showNoData()
                 } else {
