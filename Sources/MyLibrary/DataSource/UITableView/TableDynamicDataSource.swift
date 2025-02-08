@@ -360,7 +360,7 @@ public class TableDynamicDataSource<T: Hashable> :NSObject, UITableViewDelegate,
     }
     
     func reloadData(_ animated: Bool = true) {
-        if self.sections.flatMap({ $0.items }).isEmpty {
+        if self.sections.isEmpty {
             self.showNoData()
         } else {
             self.hideNoData()
