@@ -92,11 +92,11 @@ public class MLCheckBox: UIControl {
         stack.addArrangedSubview(imageView)
         stack.addArrangedSubview(titleLabel)
         
-        let height = self.heightAnchor.constraint(greaterThanOrEqualToConstant: 22)
-        let top = NSLayoutConstraint(item: stack, attribute: .top, relatedBy: .greaterThanOrEqual, toItem: self, attribute: .top, multiplier: 1, constant: 3)
+        let height = self.imageView.heightAnchor.constraint(equalToConstant: 22)
+        let top = NSLayoutConstraint(item: stack, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 3)
         let leading = NSLayoutConstraint(item: stack, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0)
         let trailing = NSLayoutConstraint(item: self, attribute: .trailing, relatedBy: .equal, toItem: stack, attribute: .trailing, multiplier: 1, constant: 0)
-        let bottom = NSLayoutConstraint(item: self, attribute: .trailing, relatedBy: .greaterThanOrEqual, toItem: stack, attribute: .trailing, multiplier: 1, constant: 3)
+        let bottom = NSLayoutConstraint(item: self, attribute: .trailing, relatedBy: .equal, toItem: stack, attribute: .trailing, multiplier: 1, constant: 3)
         let constraint = [top, leading, trailing, bottom, height]
         constraint.forEach{ $0.priority = UILayoutPriority(999) }
         self.addConstraints(constraint)
