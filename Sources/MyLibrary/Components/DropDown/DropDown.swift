@@ -117,12 +117,12 @@ fileprivate class DropDown<T: Hashable & DropDownItem>: UIViewController, UIPopo
             width = max(300, (popoverPresentationController?.sourceRect.width ?? 0) - 30)
         }
         let max = UIScreen.bounceWindow.height * 0.8
-        var height:CGFloat = CGFloat(items.count * 50)
-        if let nv = self.navigationController {
-            height += nv.navigationBar.frame.height
-        }
-        height = min(height,max)
-        preferredContentSize = CGSize(width: width, height: height)
+//        var height:CGFloat = CGFloat(items.count * 50)
+//        if let nv = self.navigationController {
+//            height += nv.navigationBar.frame.height
+//        }
+//        height = min(height,max)
+//        preferredContentSize = CGSize(width: width, height: height)
         
         ds.updateItems(items)
         
@@ -135,7 +135,7 @@ fileprivate class DropDown<T: Hashable & DropDownItem>: UIViewController, UIPopo
             .drive(with: self, onNext: { s, height in
                 s.preferredContentSize =
                 CGSize(
-                    width: s.preferredContentSize.width,
+                    width: width,
                     height: height
                 )
             })
