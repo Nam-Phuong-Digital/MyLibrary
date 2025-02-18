@@ -84,6 +84,7 @@ fileprivate class DropDown<T: Hashable & DropDownItem>: UIViewController, UIPopo
     }
     
     private var ds: TableDataSource<T, UITableViewCell>!
+    private var height: CGFloat = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -117,28 +118,22 @@ fileprivate class DropDown<T: Hashable & DropDownItem>: UIViewController, UIPopo
             width = max(300, (popoverPresentationController?.sourceRect.width ?? 0) - 30)
         }
         let max = UIScreen.bounceWindow.height * 0.8
-//        var height:CGFloat = CGFloat(items.count * 50)
-//        if let nv = self.navigationController {
-//            height += nv.navigationBar.frame.height
-//        }
-//        height = min(height,max)
-//        preferredContentSize = CGSize(width: width, height: height)
+        var height:CGFloat = CGFloat(items.count * 50)
+        if let nv = self.navigationController {
+            height += nv.navigationBar.frame.height
+        }
+        height = min(height,max)
+        preferredContentSize = CGSize(width: width, height: height)
         
         ds.updateItems(items)
         
         tableView.rx.observe(CGSize.self, #keyPath(UIScrollView.contentSize))
             .map { $0?.height }
-            .filter { [weak self] in $0 != nil && self?.preferredContentSize.height != $0 }
+            .filter { $0 != nil }
             .map { $0! }
             .distinctUntilChanged()
             .subscribe(with: self, onNext: { s, height in
-                if height > self.preferredContentSize.height {
-                    s.preferredContentSize =
-                    CGSize(
-                        width: width,
-                        height: height
-                    )
-                }
+                s.height = height
             })
             .disposed(by: disposeBag)
     }
@@ -146,6 +141,11 @@ fileprivate class DropDown<T: Hashable & DropDownItem>: UIViewController, UIPopo
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         result(current) // involked result when dismissed
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.preferredContentSize = CGSize(width: 300, height: height)
     }
 
     func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
