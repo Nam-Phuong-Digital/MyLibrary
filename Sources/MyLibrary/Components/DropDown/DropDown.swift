@@ -133,11 +133,13 @@ fileprivate class DropDown<T: Hashable & DropDownItem>: UIViewController, UIPopo
             .map { $0! }
             .distinctUntilChanged()
             .drive(with: self, onNext: { s, height in
-                s.preferredContentSize =
-                CGSize(
-                    width: width,
-                    height: height
-                )
+                if height > self.preferredContentSize.height {
+                    s.preferredContentSize =
+                    CGSize(
+                        width: width,
+                        height: height
+                    )
+                }
             })
             .disposed(by: disposeBag)
     }
