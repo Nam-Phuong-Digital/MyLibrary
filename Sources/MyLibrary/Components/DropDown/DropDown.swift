@@ -127,12 +127,11 @@ fileprivate class DropDown<T: Hashable & DropDownItem>: UIViewController, UIPopo
         ds.updateItems(items)
         
         tableView.rx.observe(CGSize.self, #keyPath(UIScrollView.contentSize))
-            .asDriver(onErrorJustReturn: nil)
             .map { $0?.height }
             .filter { [weak self] in $0 != nil && self?.preferredContentSize.height != $0 }
             .map { $0! }
             .distinctUntilChanged()
-            .drive(with: self, onNext: { s, height in
+            .subscribe(with: self, onNext: { s, height in
                 if height > self.preferredContentSize.height {
                     s.preferredContentSize =
                     CGSize(
