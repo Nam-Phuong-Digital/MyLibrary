@@ -15,7 +15,7 @@ public class DateConvert {
     public init?(
         date: Date? = nil,
         dateString: String? = nil,
-        isUTC:Bool = false,
+        isUTC:Bool = true,
         formatOutput:String = "yyyy-MM-dd'T'HH:mm:ss"
     ) {
         var localDate:Date?
