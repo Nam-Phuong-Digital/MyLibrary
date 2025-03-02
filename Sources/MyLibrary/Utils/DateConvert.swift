@@ -15,6 +15,7 @@ public class DateConvert {
     public init?(
         date: Date? = nil,
         dateString: String? = nil,
+        isUTC:Bool = false,
         formatOutput:String = "yyyy-MM-dd'T'HH:mm:ss"
     ) {
         var localDate:Date?
@@ -23,7 +24,7 @@ public class DateConvert {
             self.dateString = dateString
             if let date = Self.fromStringToDate(dateString: dateString) {
                 localDate = date
-                localDateString = Self.fromDateToString(date: date, format: formatOutput)
+                localDateString = Self.fromDateToString(date: date, format: formatOutput, isUTC: isUTC)
             }
         }
         if let date {
