@@ -22,6 +22,10 @@ public extension UITableView {
         register(UINib(nibName: String(describing: cellType.self), bundle: nil), forCellReuseIdentifier: String(describing: cellType.self))
     }
     
+    func registerClass<T: UITableViewCell>(_ cellType: T.Type) {
+        register(cellType.self, forCellReuseIdentifier: String(describing: cellType.self))
+    }
+    
     func register<T: UITableViewHeaderFooterView>(_ headerFooterType: T.Type) {
         register(UINib(nibName: String(describing: headerFooterType.self), bundle: nil), forHeaderFooterViewReuseIdentifier: String(describing: headerFooterType.self))
     }
@@ -564,7 +568,15 @@ private extension TableDynamicDataSource {
     }
     
     func register(for cell: UITableViewCell.Type) {
-        self.tableView.register(cell)
+        let className = String(describing: cell)
+        let bundle = Bundle(for: cell)
+        
+        if bundle.path(forResource: className, ofType: "xib") != nil {
+            let nib = UINib(nibName: className, bundle: bundle)
+            self.tableView.register(cell)
+        } else {
+            self.tableView.registerClass(cell)
+        }
     }
     
     func register(for view: UITableViewHeaderFooterView.Type) {
