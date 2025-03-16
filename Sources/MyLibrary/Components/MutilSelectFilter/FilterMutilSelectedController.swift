@@ -90,8 +90,6 @@ class FilterMutilSelectedController<T: Hashable & DropDownItem, S: Hashable & Dr
         fatalError("init(coder:) has not been implemented")
     }
     
-    private var _dataSource:Any?
-    
     private var ds: TableDynamicDataSource<T>!
     
     override func viewDidLoad() {
@@ -153,7 +151,7 @@ class FilterMutilSelectedController<T: Hashable & DropDownItem, S: Hashable & Dr
     }
     
     private func config(tableView:UITableView, item: T) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: "UITableViewCell")
         if #available(iOS 14.0, *) {
             var configure = UIListContentConfiguration.cell()
             configure.text = item.content
