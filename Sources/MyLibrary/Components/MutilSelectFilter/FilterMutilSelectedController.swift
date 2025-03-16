@@ -33,17 +33,23 @@ public extension UIViewController {
         )
         if title != nil || !subItems.isEmpty {
             vc.title = title
-            let nv = PopoverNavigationController(root: vc, sourceView: sourceView)
-            let popVC = PopoverContainerController(
-                sourceView: sourceView,
-                contentController: nv
-            )
-            self.present(popVC, animated: true)
+            let nv = UINavigationController(rootViewController: vc)
+            if #available(iOS 15.0, *) {
+                if let sheet = nv.sheetPresentationController {
+                    sheet.detents = [.medium(), .large()]
+                }
+            }
+            self.present(nv, animated: true)
         } else {
             let popVC = PopoverContainerController(
                 sourceView: sourceView,
                 contentController: vc
             )
+            if #available(iOS 15.0, *) {
+                if let sheet = popVC.sheetPresentationController {
+                    sheet.detents = [.medium(), .large()]
+                }
+            }
             self.present(popVC, animated: true)
         }
     }
