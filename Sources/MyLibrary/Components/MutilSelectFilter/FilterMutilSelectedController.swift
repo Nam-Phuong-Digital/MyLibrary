@@ -151,18 +151,18 @@ class FilterMutilSelectedController<T: Hashable & DropDownItem, S: Hashable & Dr
     }
     
     private func config(tableView:UITableView, item: T) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "UITableViewCell")
+        let cell = tableView.dequeue(UITableViewCell.self)
         if #available(iOS 14.0, *) {
             var configure = UIListContentConfiguration.cell()
             configure.text = item.content
             configure.textProperties.numberOfLines = 3
-            cell?.contentConfiguration = configure
+            cell.contentConfiguration = configure
         } else {
-            cell?.textLabel?.numberOfLines = 3
-            cell?.textLabel?.text = item.content
+            cell.textLabel?.numberOfLines = 3
+            cell.textLabel?.text = item.content
         }
-        cell?.accessoryType = self.current.contains(item) ? .checkmark : .none
-        cell?.setBGColor(.clear)
-        return cell ?? UITableViewCell()
+        cell.accessoryType = self.current.contains(item) ? .checkmark : .none
+        cell.setBGColor(.clear)
+        return cell
     }
 }
