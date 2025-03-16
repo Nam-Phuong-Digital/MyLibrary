@@ -571,7 +571,7 @@ private extension TableDynamicDataSource {
         let className = String(describing: cell)
         let bundle = Bundle(for: cell)
         
-        if bundle.path(forResource: className, ofType: "xib") != nil {
+        if bundle.path(forResource: className, ofType: "nib") != nil {
             let nib = UINib(nibName: className, bundle: bundle)
             self.tableView.register(cell)
         } else {
