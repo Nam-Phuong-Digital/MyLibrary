@@ -127,7 +127,7 @@ class FilterMutilSelectedController<T: Hashable & DropDownItem, S: Hashable & Dr
             }
         )
         
-        self.ds.updateItems(Array(Set(items)))
+        self.ds.updateItems(items)
     }
    
     @objc func selectorDone(_ sender: Any) {

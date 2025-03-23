@@ -174,7 +174,7 @@ class FilterSingleSelectedController<T: Hashable & DropDownItem>: UIViewControll
             }
         )
         
-        self.ds.updateItems(Array(Set(items)))
+        self.ds.updateItems(items)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
