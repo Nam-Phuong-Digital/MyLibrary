@@ -232,14 +232,6 @@ public class TableDataSource<T: Hashable, CELL: UITableViewCell>:NSObject, UITab
     }
     
     public func updateSections(items: [SectionDataSourceModel<T>]) {
-        shouldReloadSections = []
-        var section = 0
-        zip(self.sections, items).forEach { (old, new) in
-            if old != new {
-                shouldReloadSections.append(section)
-            }
-            section += 1
-        }
         self.sections = items
         reloadData()
     }
