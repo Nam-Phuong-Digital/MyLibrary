@@ -531,7 +531,7 @@ public class TableDynamicDataSource<T: Hashable> :NSObject, UITableViewDelegate,
     }
 }
 
-private extension TableDynamicDataSource {
+public  extension TableDynamicDataSource {
     
     func showNoData() {
         hideNoData()
