@@ -40,20 +40,22 @@ public class PopoverNavigationController: UINavigationController {
         super.viewDidLoad()
         self.viewControllers = [root]
         
-        if #available(iOS 13.0, *) {
-            self.navigationBar.scrollEdgeAppearance = .standard
-        } else {
-            self.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
-            self.navigationBar.backgroundColor = Resource.Color.tertiary
-            navigationController?.navigationBar.setBackgroundImage(Resource.Color.tertiary?.imageRepresentation, for: .default)
-            navigationController?.navigationBar.shadowImage = UIImage()
-            navigationController?.view.backgroundColor = Resource.Color.tertiary
-            self.navigationController?.navigationBar.isTranslucent = false
+        if #unavailable(iOS 26) {
+            if #available(iOS 13.0, *) {
+                self.navigationBar.scrollEdgeAppearance = .standard
+            } else {
+                self.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
+                self.navigationBar.backgroundColor = Resource.Color.tertiary
+                navigationController?.navigationBar.setBackgroundImage(Resource.Color.tertiary?.imageRepresentation, for: .default)
+                navigationController?.navigationBar.shadowImage = UIImage()
+                navigationController?.view.backgroundColor = Resource.Color.tertiary
+                self.navigationController?.navigationBar.isTranslucent = false
+            }
+            
+            self.navigationController?.navigationBar.barTintColor = Resource.Color.tertiary
+            self.navigationController?.view.backgroundColor = Resource.Color.tertiary
+            self.navigationController?.navigationBar.tintColor = Resource.Color.onTertiary
         }
-        
-        self.navigationController?.navigationBar.barTintColor = Resource.Color.tertiary
-        self.navigationController?.view.backgroundColor = Resource.Color.tertiary
-        self.navigationController?.navigationBar.tintColor = Resource.Color.onTertiary
     }
 }
 
