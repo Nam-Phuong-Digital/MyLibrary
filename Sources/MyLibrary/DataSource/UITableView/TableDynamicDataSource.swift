@@ -258,14 +258,6 @@ public class TableDynamicDataSource<T: Hashable> :NSObject, UITableViewDelegate,
     }
     
     public func updateSections(items: [SectionDataSourceModel<T>]) {
-        shouldReloadSections = []
-        var section = 0
-        zip(self.sections, items).forEach { (old, new) in
-            if old != new {
-                shouldReloadSections.append(section)
-            }
-            section += 1
-        }
         self.sections = items
         reloadData()
     }
@@ -373,10 +365,6 @@ public class TableDynamicDataSource<T: Hashable> :NSObject, UITableViewDelegate,
             var snap = NSDiffableDataSourceSnapshot<Int, T>()
             let sectionIndex = self.sections.enumerated().map{$0.0}
             snap.appendSections(sectionIndex)
-            if !shouldReloadSections.isEmpty {
-                snap.reloadSections(shouldReloadSections)
-                shouldReloadSections = []
-            }
             self.sections.enumerated().forEach { (offset,section) in
                 snap.appendItems(section.items, toSection: offset)
             }
