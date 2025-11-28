@@ -381,9 +381,19 @@ public class TableDynamicDataSource<T: Hashable> :NSObject, UITableViewDelegate,
     public func finishPullToRefresh() {
         refreshControl.endRefreshing()
     }
-    
+
     public func finishLoadMore() {
         loadMoreIndicator.stop()
+    }
+
+    /// Set the item selection handler
+    public func setItemSelectionHandler(_ handler: SELECTED_ITEM<T>) {
+        self.selectingItem = handler
+    }
+
+    /// Set the scroll view delegating handler
+    public func setScrollViewDelegating(_ handler: ((DataSourceScrollViewConfiguration) -> Void)?) {
+        self.scrollViewDelegating = handler
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -593,5 +603,429 @@ public extension TableDynamicDataSource {
 public class SwipableDataSource<T: Hashable>: UITableViewDiffableDataSource<Int, T> {
     public override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
+    }
+}
+
+// MARK: - Reactive Extension for TableDynamicDataSource
+public extension TableDynamicDataSource {
+
+    /// Provides access to reactive extensions
+    var rx: RxTableDynamicDataSourceExtension<T> {
+        return RxTableDynamicDataSourceExtension(base: self)
+    }
+}
+
+/// Reactive extensions for TableDynamicDataSource
+public struct RxTableDynamicDataSourceExtension<T: Hashable> {
+    internal let base: TableDynamicDataSource<T>
+
+    fileprivate init(base: TableDynamicDataSource<T>) {
+        self.base = base
+    }
+
+    /// Reactive binding for updating items in a single section
+    /// - Usage:
+    /// ```swift
+    /// viewModel.items
+    ///     .bind(to: dataSource.rx.items)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var items: Binder<[T]> {
+        return Binder(base) { dataSource, items in
+            dataSource.updateItems(items, to: 0, animated: true)
+        }
+    }
+
+    /// Reactive binding for updating items in a specific section with animation control
+    /// - Usage:
+    /// ```swift
+    /// viewModel.items
+    ///     .bind(to: dataSource.rx.items(section: 0, animated: true))
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public func items(section: Int = 0, animated: Bool = true) -> Binder<[T]> {
+        return Binder(base) { dataSource, items in
+            dataSource.updateItems(items, to: section, animated: animated)
+        }
+    }
+
+    /// Reactive binding for updating multiple sections
+    /// - Usage:
+    /// ```swift
+    /// viewModel.sections
+    ///     .bind(to: dataSource.rx.sections)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var sections: Binder<[SectionDataSourceModel<T>]> {
+        return Binder(base) { dataSource, sections in
+            dataSource.updateSections(items: sections)
+        }
+    }
+
+    /// Reactive binding for appending items to a section
+    /// - Usage:
+    /// ```swift
+    /// viewModel.newItems
+    ///     .bind(to: dataSource.rx.appendItems(to: 0))
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public func appendItems(to section: Int = 0) -> Binder<[T]> {
+        return Binder(base) { dataSource, items in
+            dataSource.appendItems(items: items, to: section)
+        }
+    }
+
+    /// Reactive binding for appending sections
+    /// - Usage:
+    /// ```swift
+    /// viewModel.newSections
+    ///     .bind(to: dataSource.rx.appendSections)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var appendSections: Binder<[SectionDataSourceModel<T>]> {
+        return Binder(base) { dataSource, sections in
+            dataSource.appendSections(items: sections)
+        }
+    }
+
+    /// Reactive binding for stopping pull to refresh control
+    /// - Usage:
+    /// ```swift
+    /// viewModel.finishedLoading
+    ///     .bind(to: dataSource.rx.stopPullRefresh)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var stopPullRefresh: Binder<Void> {
+        return Binder(base) { dataSource, _ in
+            dataSource.finishPullToRefresh()
+        }
+    }
+
+    /// Reactive binding for stopping load more indicator
+    /// - Usage:
+    /// ```swift
+    /// viewModel.finishedLoadingMore
+    ///     .bind(to: dataSource.rx.stopLoadMore)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var stopLoadMore: Binder<Void> {
+        return Binder(base) { dataSource, _ in
+            dataSource.finishLoadMore()
+        }
+    }
+
+    /// Reactive binding for stopping both pull refresh and load more
+    /// - Usage:
+    /// ```swift
+    /// viewModel.finishedLoading
+    ///     .bind(to: dataSource.rx.stopLoading)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var stopLoading: Binder<Void> {
+        return Binder(base) { dataSource, _ in
+            dataSource.finishPullToRefresh()
+            dataSource.finishLoadMore()
+        }
+    }
+
+    /// Reactive binding for reloading specific items
+    /// - Usage:
+    /// ```swift
+    /// viewModel.updatedItems
+    ///     .bind(to: dataSource.rx.reloadItems(animated: true))
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public func reloadItems(animated: Bool = true) -> Binder<[T]> {
+        return Binder(base) { dataSource, items in
+            dataSource.reloadItems(items, animated: animated)
+        }
+    }
+
+    /// Reactive binding for reloading specific sections
+    /// - Usage:
+    /// ```swift
+    /// Observable.just([0, 1])
+    ///     .bind(to: dataSource.rx.reloadSections(animated: true))
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public func reloadSections(animated: Bool = true) -> Binder<[Int]> {
+        return Binder(base) { dataSource, sections in
+            dataSource.reloadSections(sections, animated: animated)
+        }
+    }
+
+    /// Reactive binding for removing items
+    /// - Usage:
+    /// ```swift
+    /// viewModel.itemsToRemove
+    ///     .bind(to: dataSource.rx.removeItems)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var removeItems: Binder<[T]> {
+        return Binder(base) { dataSource, items in
+            dataSource.removeItems(items: items)
+        }
+    }
+
+    /// Reactive binding for removing sections
+    /// - Usage:
+    /// ```swift
+    /// viewModel.sectionsToRemove
+    ///     .bind(to: dataSource.rx.removeSections)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var removeSections: Binder<[SectionDataSourceModel<T>]> {
+        return Binder(base) { dataSource, sections in
+            dataSource.removeSections(sections)
+        }
+    }
+
+    /// Observable for item selection events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.itemSelected
+    ///     .subscribe(onNext: { item in
+    ///         print("Selected item: \(item)")
+    ///     })
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var itemSelected: Observable<T> {
+        let subject = PublishSubject<T>()
+        base.setItemSelectionHandler { item in
+            subject.onNext(item)
+        }
+        return subject.asObservable()
+    }
+
+    /// Observable for pull to refresh events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.pullToRefresh
+    ///     .flatMapLatest { viewModel.fetchItems() }
+    ///     .bind(to: dataSource.rx.items)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var pullToRefresh: Observable<Void> {
+        return scrollViewDelegating
+            .compactMap { config in
+                if case .pullToRefresh = config {
+                    return ()
+                }
+                return nil
+            }
+    }
+
+    /// Observable for load more events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.loadMore
+    ///     .flatMapLatest { viewModel.fetchMoreItems() }
+    ///     .bind(to: dataSource.rx.appendItems())
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var loadMore: Observable<Void> {
+        return scrollViewDelegating
+            .compactMap { config in
+                if case .loadMore = config {
+                    return ()
+                }
+                return nil
+            }
+    }
+
+    /// Observable for scroll events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.didScroll
+    ///     .subscribe(onNext: { scrollView in
+    ///         print("Content offset: \(scrollView.contentOffset)")
+    ///     })
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var didScroll: Observable<UIScrollView> {
+        return scrollViewDelegating
+            .compactMap { config in
+                if case .didScroll(let scrollView) = config {
+                    return scrollView
+                }
+                return nil
+            }
+    }
+
+    /// Observable for all scroll view delegating events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.scrollViewDelegating
+    ///     .subscribe(onNext: { config in
+    ///         switch config {
+    ///         case .pullToRefresh:
+    ///             print("Pull to refresh triggered")
+    ///         case .loadMore:
+    ///             print("Load more triggered")
+    ///         case .didScroll(let scrollView):
+    ///             print("Scrolling at offset: \(scrollView.contentOffset)")
+    ///         case .didEndDecelerating(let scrollView):
+    ///             print("Ended decelerating")
+    ///         case .didEndDragging(let scrollView):
+    ///             print("Ended dragging")
+    ///         case .willDisplayHeader(let section, let view):
+    ///             print("Will display header for section \(section)")
+    ///         case .willDisplayFooter(let section, let view):
+    ///             print("Will display footer for section \(section)")
+    ///         case .didEndDisplayHeader(let section, let view):
+    ///             print("Did end display header for section \(section)")
+    ///         case .didEndDisplayFooter(let section, let view):
+    ///             print("Did end display footer for section \(section)")
+    ///         case .shoudLoadMore(let closure):
+    ///             // Check if should load more
+    ///             let shouldLoad = true
+    ///             closure(shouldLoad)
+    ///         }
+    ///     })
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var scrollViewDelegating: Observable<DataSourceScrollViewConfiguration> {
+        return Observable.create { [weak base] observer in
+            guard let base = base else {
+                observer.onCompleted()
+                return Disposables.create()
+            }
+
+            base.setScrollViewDelegating { config in
+                observer.onNext(config)
+            }
+
+            return Disposables.create()
+        }
+    }
+
+    /// Observable for scroll view did end decelerating events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.didEndDecelerating
+    ///     .subscribe(onNext: { scrollView in
+    ///         print("Scroll ended at: \(scrollView.contentOffset)")
+    ///     })
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var didEndDecelerating: Observable<UIScrollView> {
+        return scrollViewDelegating
+            .compactMap { config in
+                if case .didEndDecelerating(let scrollView) = config {
+                    return scrollView
+                }
+                return nil
+            }
+    }
+
+    /// Observable for scroll view did end dragging events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.didEndDragging
+    ///     .subscribe(onNext: { scrollView in
+    ///         print("Dragging ended")
+    ///     })
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var didEndDragging: Observable<UIScrollView> {
+        return scrollViewDelegating
+            .compactMap { config in
+                if case .didEndDragging(let scrollView) = config {
+                    return scrollView
+                }
+                return nil
+            }
+    }
+
+    /// Observable for will display header events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.willDisplayHeader
+    ///     .subscribe(onNext: { (section, view) in
+    ///         print("Will display header for section: \(section)")
+    ///     })
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var willDisplayHeader: Observable<(section: Int, view: UIView)> {
+        return scrollViewDelegating
+            .compactMap { config in
+                if case .willDisplayHeader(let section, let view) = config {
+                    return (section, view)
+                }
+                return nil
+            }
+    }
+
+    /// Observable for will display footer events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.willDisplayFooter
+    ///     .subscribe(onNext: { (section, view) in
+    ///         print("Will display footer for section: \(section)")
+    ///     })
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var willDisplayFooter: Observable<(section: Int, view: UIView)> {
+        return scrollViewDelegating
+            .compactMap { config in
+                if case .willDisplayFooter(let section, let view) = config {
+                    return (section, view)
+                }
+                return nil
+            }
+    }
+
+    /// Observable for did end display header events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.didEndDisplayHeader
+    ///     .subscribe(onNext: { (section, view) in
+    ///         print("Did end display header for section: \(section)")
+    ///     })
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var didEndDisplayHeader: Observable<(section: Int, view: UIView)> {
+        return scrollViewDelegating
+            .compactMap { config in
+                if case .didEndDisplayHeader(let section, let view) = config {
+                    return (section, view)
+                }
+                return nil
+            }
+    }
+
+    /// Observable for did end display footer events
+    /// - Usage:
+    /// ```swift
+    /// dataSource.rx.didEndDisplayFooter
+    ///     .subscribe(onNext: { (section, view) in
+    ///         print("Did end display footer for section: \(section)")
+    ///     })
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var didEndDisplayFooter: Observable<(section: Int, view: UIView)> {
+        return scrollViewDelegating
+            .compactMap { config in
+                if case .didEndDisplayFooter(let section, let view) = config {
+                    return (section, view)
+                }
+                return nil
+            }
+    }
+
+    /// Binder for setting scroll view delegating closure
+    /// - Usage:
+    /// ```swift
+    /// let delegatingClosure: (DataSourceScrollViewConfiguration) -> Void = { config in
+    ///     // Handle scroll view events
+    /// }
+    /// Observable.just(delegatingClosure)
+    ///     .bind(to: dataSource.rx.setScrollViewDelegating)
+    ///     .disposed(by: disposeBag)
+    /// ```
+    public var setScrollViewDelegatingHandler: Binder<((DataSourceScrollViewConfiguration) -> Void)?> {
+        return Binder(base) { dataSource, delegating in
+            dataSource.setScrollViewDelegating(delegating)
+        }
     }
 }
