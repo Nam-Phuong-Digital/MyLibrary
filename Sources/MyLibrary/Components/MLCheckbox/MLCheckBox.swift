@@ -6,6 +6,16 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
+
+extension Reactive where Base: MLCheckBox {
+    public var isChecked: Binder<Bool> {
+        return Binder(self.base) { checkBox, value in
+            checkBox.isChecked = value
+        }
+    }
+}
 
 @IBDesignable
 public class MLCheckBox: UIControl {
