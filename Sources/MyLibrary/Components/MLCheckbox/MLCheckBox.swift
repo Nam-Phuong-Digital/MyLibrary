@@ -82,10 +82,8 @@ public class MLCheckBox: UIControl {
         
         imageView.image = normalImage
         imageView.highlightedImage = selectedImage
-        imageView.addConstraints([
-            .init(item: imageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 16),
-            .init(item: imageView, attribute: .width, relatedBy: .equal, toItem: imageView, attribute: .height, multiplier: 1, constant: 0)
-        ])
+        imageView.heightAnchor.constraint(equalToConstant: 16).isActive = true
+        imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 1).isActive = true
         
         stack.addArrangedSubview(imageView)
         stack.addArrangedSubview(titleLabel)
