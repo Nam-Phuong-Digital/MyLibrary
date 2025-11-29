@@ -99,6 +99,14 @@ public class MLCheckBox: UIControl {
         stack.boundInside(self, insets: .init(top: 3, left: 0, bottom: 3, right: 0))
 
         updateUI()
+        
+        _ = rx.controlEvent(.touchUpInside)
+            .take(until: rx.deallocated)
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self, onNext: { owner, _ in
+                owner.isChecked.toggle()
+                owner.sendActions(for: .valueChanged)
+            })
     }
     
     private func updateUI() {
