@@ -102,7 +102,7 @@ public extension UIButton {
                 var bg = UIBackgroundConfiguration.clear()
                 bg.backgroundColor = .clear
                 btn.configuration?.background = bg
-                btn.configuration?.title = ""
+                btn.configuration?.title = title
                 btn.configuration?.image = btn.isSelected ? selectedImage?.withTintColor(.tintColor, renderingMode: .alwaysTemplate) : image?.withTintColor(.tintColor, renderingMode: .alwaysTemplate)
                 btn.configuration?.baseForegroundColor = tintColor
             }
