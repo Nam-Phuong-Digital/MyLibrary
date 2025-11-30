@@ -88,8 +88,13 @@ public extension UIButton {
         }
     }
     
-    func setCheckBoxStyle(image:UIImage?, selectedImage:UIImage?, tintColor:UIColor = .black) {
-        setTitle("", for: UIControl.State())
+    func setCheckBoxStyle(
+        title: String? = nil,
+        image:UIImage?,
+        selectedImage:UIImage?,
+        tintColor:UIColor = .black
+    ) {
+        setTitle(title ?? "", for: UIControl.State())
         self.tintColor = tintColor
         if #available(iOS 15, *) {
             configuration = .plain()
