@@ -92,7 +92,9 @@ public extension UIButton {
         title: String? = nil,
         image:UIImage?,
         selectedImage:UIImage?,
-        tintColor:UIColor = .black
+        tintColor:UIColor = .black,
+        font: UIFont? = nil,
+        titleColor: UIColor = .black
     ) {
         setTitle(title ?? "", for: UIControl.State())
         self.tintColor = tintColor
@@ -105,9 +107,21 @@ public extension UIButton {
                 btn.configuration?.title = title
                 btn.configuration?.image = btn.isSelected ? selectedImage?.withTintColor(.tintColor, renderingMode: .alwaysTemplate) : image?.withTintColor(.tintColor, renderingMode: .alwaysTemplate)
                 btn.configuration?.baseForegroundColor = tintColor
+                btn.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer({ income in
+                    var temp = income
+                    temp.foregroundColor = titleColor
+                    if let font {
+                        temp.font = font
+                    } else {
+                        temp.font = UIFont.systemFont(ofSize: 14)
+                    }
+                    return temp
+                })
             }
         } else {
             backgroundColor = .clear
+            titleLabel?.font = font ?? .systemFont(ofSize: 14)
+            titleLabel?.textColor = titleColor
             setImage(image, for: .normal)
             setImage(selectedImage, for: .selected)
         }
