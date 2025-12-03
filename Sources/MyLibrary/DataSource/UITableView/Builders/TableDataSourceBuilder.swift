@@ -28,10 +28,33 @@ public final class TableDataSourceBuilder<T: Hashable> {
 
     // MARK: - Cell Configuration
 
-    /// Register cell types
+    /// Register cell types (auto-detects NIB vs Class)
     @discardableResult
     public func cells(_ types: UITableViewCell.Type...) -> Self {
         cellTypes.append(contentsOf: types)
+        return self
+    }
+
+    /// Register cell types from NIB files explicitly
+    @discardableResult
+    public func cellsFromNib(_ types: UITableViewCell.Type...) -> Self {
+        types.forEach { cellType in
+            let className = String(describing: cellType)
+            let bundle = Bundle(for: cellType)
+            let nib = UINib(nibName: className, bundle: bundle)
+            tableView.register(nib, forCellReuseIdentifier: className)
+            cellTypes.append(cellType)
+        }
+        return self
+    }
+
+    /// Register cell types from class (code-only cells) explicitly
+    @discardableResult
+    public func cellsFromClass(_ types: UITableViewCell.Type...) -> Self {
+        types.forEach { cellType in
+            tableView.registerClass(cellType)
+            cellTypes.append(cellType)
+        }
         return self
     }
 

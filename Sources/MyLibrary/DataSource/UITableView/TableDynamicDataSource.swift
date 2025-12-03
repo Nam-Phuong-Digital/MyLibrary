@@ -568,10 +568,10 @@ public  extension TableDynamicDataSource {
     func register(for cell: UITableViewCell.Type) {
         let className = String(describing: cell)
         let bundle = Bundle(for: cell)
-        
+
         if bundle.path(forResource: className, ofType: "nib") != nil {
             let nib = UINib(nibName: className, bundle: bundle)
-            self.tableView.register(cell)
+            self.tableView.register(nib, forCellReuseIdentifier: className)
         } else {
             self.tableView.registerClass(cell)
         }
